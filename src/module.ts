@@ -10,18 +10,17 @@ import endent from 'endent';
 
 export const CUSTOM_CLI_ERROR_MESSAGE =
   'Default export from server/cli.ts must be wrapped with defineCustomCli(...).';
+const DEFINE_WRAPPER_USED_MARKER = '__defineCustomCliUsed';
 
 export default defineNuxtModule({
   setup: (_options, nuxt) => {
-    const customCliMarker = '__nuxtCustomCli';
-
     const defineCustomCliTemplate = addTemplate({
       filename: 'custom-cli-define.ts',
       getContents: () => endent`
         export type CustomCliHandler = () => unknown;
 
         export const defineCustomCli = (handler: CustomCliHandler) =>
-          Object.defineProperty(handler, '${customCliMarker}', {
+          Object.defineProperty(handler, '${DEFINE_WRAPPER_USED_MARKER}', {
             configurable: false,
             enumerable: false,
             value: true,
@@ -59,7 +58,7 @@ export default defineNuxtModule({
           import main from '${cliImportPath}';
 
           const assertCustomCli = () => {
-            if (typeof main !== 'function' || !main['${customCliMarker}']) {
+            if (typeof main !== 'function' || !main['${DEFINE_WRAPPER_USED_MARKER}']) {
               throw new Error('${CUSTOM_CLI_ERROR_MESSAGE}');
             }
           };
@@ -106,7 +105,7 @@ export default defineNuxtModule({
         import main from '${cliImportPath}';
 
         const assertCustomCli = () => {
-          if (typeof main !== 'function' || !main['${customCliMarker}']) {
+          if (typeof main !== 'function' || !main['${DEFINE_WRAPPER_USED_MARKER}']) {
             throw new Error('${CUSTOM_CLI_ERROR_MESSAGE}');
           }
         };
