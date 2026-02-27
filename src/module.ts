@@ -8,14 +8,25 @@ import {
 } from '@nuxt/kit';
 import endent from 'endent';
 
+export const CUSTOM_CLI_ERROR_MESSAGE =
+  'Default export from server/cli.ts must be wrapped with defineCustomCli(...).';
+
 export default defineNuxtModule({
   setup: (_options, nuxt) => {
+    const customCliMarker = '__nuxtCustomCli';
+
     const defineCustomCliTemplate = addTemplate({
       filename: 'custom-cli-define.ts',
       getContents: () => endent`
         export type CustomCliHandler = () => unknown;
 
-        export const defineCustomCli = (handler: CustomCliHandler) => handler;
+        export const defineCustomCli = (handler: CustomCliHandler) =>
+          Object.defineProperty(handler, '${customCliMarker}', {
+            configurable: false,
+            enumerable: false,
+            value: true,
+            writable: false,
+          });
       `,
       write: true,
     });
@@ -47,6 +58,12 @@ export default defineNuxtModule({
         getContents: () => endent`
           import main from '${cliImportPath}';
 
+          const assertCustomCli = () => {
+            if (typeof main !== 'function' || !main['${customCliMarker}']) {
+              throw new Error('${CUSTOM_CLI_ERROR_MESSAGE}');
+            }
+          };
+
           export default defineNitroPlugin(() => {
             if (process.env.NUXT_RUN_CLI !== '1') {
               return;
@@ -54,6 +71,7 @@ export default defineNuxtModule({
 
             queueMicrotask(async () => {
               try {
+                assertCustomCli();
                 const args = JSON.parse(process.env.NUXT_CLI_ARGS || '[]');
                 process.argv = [...process.argv, ...args];
                 await main();
@@ -87,7 +105,14 @@ export default defineNuxtModule({
       getContents: () => endent`
         import main from '${cliImportPath}';
 
+        const assertCustomCli = () => {
+          if (typeof main !== 'function' || !main['${customCliMarker}']) {
+            throw new Error('${CUSTOM_CLI_ERROR_MESSAGE}');
+          }
+        };
+
         const run = async () => {
+          assertCustomCli();
           await main();
 
           if (process.listenerCount('SIGTERM') > 0) {
