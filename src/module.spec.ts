@@ -44,12 +44,12 @@ test.describe('dev', () => {
 
     const result = await execaCommand('tsx ../../src/cli.ts', {
       cwd,
-      env: { NODE_ENV: '' },
+      env: { CI: '1', NODE_ENV: '' }, // CI: 1 for consistent log output between local and CI runs
       reject: false,
     });
 
     expect(result.exitCode).toBe(1);
-    expect(stripAnsi(result.stdout)).toMatch(/^ ERROR  foo$/m);
+    expect(stripAnsi(result.stdout)).toMatch(/^\[log\] \[error\] foo$/m);
   });
 
   test('no defineCustomCli', async ({}, testInfo) => {
@@ -95,8 +95,11 @@ test.describe('prod', () => {
     await outputFiles(cwd, {
       'nuxt.config.ts':
         "export default defineNuxtConfig({ modules: ['../../src'] });",
-      'server/cli.ts':
-        "export default defineCustomCli(() => { throw new Error('foo'); })",
+      server: {
+        // Auto-import so that server is started
+        'cli.ts': 'export default defineCustomCli(() => foo())',
+        'utils/foo.ts': "export default () => { throw new Error('foo'); }",
+      },
     });
 
     await execaCommand('nuxt build', { cwd });
