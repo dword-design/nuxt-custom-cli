@@ -131,7 +131,6 @@ export default defineNuxtModule({
               : { ...rollupConfig.input, cli: entry.dst };
 
         rollupConfig.output.entryFileNames = chunkInfo => {
-          console.log(chunkInfo);
           if (chunkInfo.facadeModuleId === entry.dst) return 'cli.mjs';
           if (chunkInfo.name === 'node-server') return 'index.mjs';
           return '[name].mjs';
