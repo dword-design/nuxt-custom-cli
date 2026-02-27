@@ -1,10 +1,31 @@
 import pathLib from 'node:path';
 
-import { addServerPlugin, addTemplate, defineNuxtModule } from '@nuxt/kit';
+import {
+  addServerImports,
+  addServerPlugin,
+  addTemplate,
+  defineNuxtModule,
+} from '@nuxt/kit';
 import endent from 'endent';
 
 export default defineNuxtModule({
   setup: (_options, nuxt) => {
+    const defineCustomCliTemplate = addTemplate({
+      filename: 'custom-cli-define.ts',
+      getContents: () => endent`
+        export type CustomCliHandler = () => unknown;
+
+        export const defineCustomCli = (handler: CustomCliHandler) => handler;
+      `,
+      write: true,
+    });
+
+    addServerImports({
+      as: 'defineCustomCli',
+      from: defineCustomCliTemplate.dst,
+      name: 'defineCustomCli',
+    });
+
     const buildDir = pathLib.resolve(
       nuxt.options.rootDir,
       nuxt.options.buildDir,

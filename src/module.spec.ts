@@ -12,7 +12,7 @@ test('dev', async ({}, testInfo) => {
   await outputFiles(cwd, {
     'nuxt.config.ts':
       "export default defineNuxtConfig({ modules: ['../../src'] });",
-    'server/cli.ts': "export default () => console.log('hi')",
+    'server/cli.ts': "export default defineCustomCli(() => console.log('hi'))",
   });
 
   await execaCommand('nuxi prepare', { cwd });
@@ -31,7 +31,7 @@ test('prod', async ({}, testInfo) => {
   await outputFiles(cwd, {
     'nuxt.config.ts':
       "export default defineNuxtConfig({ modules: ['../../src'] });",
-    'server/cli.ts': "export default () => console.log('hi')",
+    'server/cli.ts': "export default defineCustomCli(() => console.log('hi'))",
   });
 
   await execaCommand('nuxt build', { cwd });
@@ -56,7 +56,7 @@ test('dependency and prod', async ({}, testInfo) => {
     'server/cli.ts': endent`
       import foo from 'foo';
 
-      export default foo;
+      export default defineCustomCli(foo);
     `,
   });
 
