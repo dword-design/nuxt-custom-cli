@@ -1,27 +1,101 @@
 import pathLib from 'node:path';
 
-import { defineNuxtModule } from '@nuxt/kit';
-
-import build from './build';
+import { addServerPlugin, addTemplate, defineNuxtModule } from '@nuxt/kit';
+import endent from 'endent';
 
 export default defineNuxtModule({
-  setup: (_, nuxt) => {
-    const globalState = globalThis as typeof globalThis & {
-      __knowledgeOutputCliBuilt?: boolean;
-    };
+  setup: (_options, nuxt) => {
+    const buildDir = pathLib.resolve(
+      nuxt.options.rootDir,
+      nuxt.options.buildDir,
+    );
 
-    nuxt.hook('nitro:build:public-assets', async nitro => {
-      if (globalState.__knowledgeOutputCliBuilt) {
-        return;
-      }
+    if (nuxt.options.dev) {
+      const cliPath = pathLib.resolve(nuxt.options.rootDir, 'server', 'cli.ts');
 
-      globalState.__knowledgeOutputCliBuilt = true;
-      const outputPath = pathLib.join(nitro.options.output.dir, 'server');
+      const relativeCliPath = pathLib
+        .relative(buildDir, cliPath)
+        .replaceAll('\\', '/');
 
-      await build({
-        alias: nuxt.options.alias,
-        outDir: outputPath,
-        rootDir: nuxt.options.rootDir,
+      const cliImportPath = relativeCliPath.startsWith('.')
+        ? relativeCliPath
+        : `./${relativeCliPath}`;
+
+      const devPlugin = addTemplate({
+        filename: 'custom-cli-dev-plugin.ts',
+        getContents: () => endent`
+          import main from '${cliImportPath}';
+
+          export default defineNitroPlugin(() => {
+            if (process.env.NUXT_RUN_CLI !== '1') {
+              return;
+            }
+
+            queueMicrotask(async () => {
+              try {
+                const args = JSON.parse(process.env.NUXT_CLI_ARGS || '[]');
+                process.argv = [...process.argv, ...args];
+                await main();
+                process.kill(process.ppid, 'SIGINT');
+              } catch (error) {
+                console.error(error);
+                process.kill(process.ppid, 'SIGTERM');
+              }
+            });
+          });
+        `,
+        write: true,
+      });
+
+      addServerPlugin(devPlugin.dst);
+      return;
+    }
+
+    const cliPath = pathLib.resolve(nuxt.options.rootDir, 'server', 'cli.ts');
+
+    const relativeCliPath = pathLib
+      .relative(buildDir, cliPath)
+      .replaceAll('\\', '/');
+
+    const cliImportPath = relativeCliPath.startsWith('.')
+      ? relativeCliPath
+      : `./${relativeCliPath}`;
+
+    const entry = addTemplate({
+      filename: 'custom-cli-entry.ts',
+      getContents: () => endent`
+        import main from '${cliImportPath}';
+
+        const run = async () => {
+          await main();
+
+          if (process.listenerCount('SIGTERM') > 0) {
+            process.exit(0);
+            return;
+          }
+        }
+
+        run();
+      `,
+      write: true,
+    });
+
+    const entryPath = pathLib.resolve(buildDir, entry.filename);
+
+    nuxt.hook('nitro:init', nitro => {
+      nitro.hooks.hook('rollup:before', (_nitro, rollupConfig) => {
+        rollupConfig.input =
+          typeof rollupConfig.input === 'string'
+            ? [rollupConfig.input, entryPath]
+            : Array.isArray(rollupConfig.input)
+              ? [...rollupConfig.input, entryPath]
+              : { ...rollupConfig.input, cli: entryPath };
+
+        rollupConfig.output.entryFileNames = chunkInfo => {
+          if (chunkInfo.name === 'custom-cli-entry') return 'cli.mjs';
+          if (chunkInfo.name === 'node-server') return 'index.mjs';
+          return '[name].mjs';
+        };
       });
     });
   },
