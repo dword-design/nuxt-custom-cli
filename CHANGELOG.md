@@ -1,3 +1,17 @@
+# [2.0.0](https://github.com/dword-design/nuxt-custom-cli/compare/v1.0.0...v2.0.0) (2026-02-27)
+
+
+### Bug Fixes
+
+* disable windows ([fb78a06](https://github.com/dword-design/nuxt-custom-cli/commit/fb78a061f23eb08b58bdb65b294993eae8111055))
+* refactor tests ([4734b8c](https://github.com/dword-design/nuxt-custom-cli/commit/4734b8c3537002a60ded6aa38973bdc2a3245b7b))
+* use nitro to run cli ([#1](https://github.com/dword-design/nuxt-custom-cli/issues/1)) ([5d22960](https://github.com/dword-design/nuxt-custom-cli/commit/5d229606d8b9ff189bff86e2caee91a9b780f133))
+
+
+### BREAKING CHANGES
+
+* use defineCustomCli and function
+
 # 1.0.0 (2026-02-27)
 
 
