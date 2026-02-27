@@ -11,11 +11,12 @@ import endent from 'endent';
 export const CUSTOM_CLI_ERROR_MESSAGE =
   'Default export from server/cli.ts must be wrapped with defineCustomCli(...).';
 const DEFINE_WRAPPER_USED_MARKER = '__defineCustomCliUsed';
+const TEMPLATE_FOLDER = 'nuxt-custom-cli';
 
 export default defineNuxtModule({
   setup: (_options, nuxt) => {
     const defineCustomCliTemplate = addTemplate({
-      filename: 'custom-cli-define.ts',
+      filename: pathLib.join(TEMPLATE_FOLDER, 'custom-cli-define.ts'),
       getContents: () => endent`
         export type CustomCliHandler = () => unknown;
 
@@ -36,16 +37,11 @@ export default defineNuxtModule({
       name: 'defineCustomCli',
     });
 
-    const buildDir = pathLib.resolve(
-      nuxt.options.rootDir,
-      nuxt.options.buildDir,
-    );
-
     if (nuxt.options.dev) {
       const cliPath = pathLib.resolve(nuxt.options.rootDir, 'server', 'cli.ts');
 
       const relativeCliPath = pathLib
-        .relative(buildDir, cliPath)
+        .relative(pathLib.join(nuxt.options.buildDir, TEMPLATE_FOLDER), cliPath)
         .replaceAll('\\', '/');
 
       const cliImportPath = relativeCliPath.startsWith('.')
@@ -53,7 +49,7 @@ export default defineNuxtModule({
         : `./${relativeCliPath}`;
 
       const devPlugin = addTemplate({
-        filename: 'custom-cli-dev-plugin.ts',
+        filename: pathLib.join(TEMPLATE_FOLDER, 'dev-plugin.ts'),
         getContents: () => endent`
           import main from '${cliImportPath}';
 
@@ -92,7 +88,7 @@ export default defineNuxtModule({
     const cliPath = pathLib.resolve(nuxt.options.rootDir, 'server', 'cli.ts');
 
     const relativeCliPath = pathLib
-      .relative(buildDir, cliPath)
+      .relative(pathLib.join(nuxt.options.buildDir, TEMPLATE_FOLDER), cliPath)
       .replaceAll('\\', '/');
 
     const cliImportPath = relativeCliPath.startsWith('.')
@@ -100,7 +96,7 @@ export default defineNuxtModule({
       : `./${relativeCliPath}`;
 
     const entry = addTemplate({
-      filename: 'custom-cli-entry.ts',
+      filename: pathLib.join(TEMPLATE_FOLDER, 'prod-entry.ts'),
       getContents: () => endent`
         import main from '${cliImportPath}';
 
@@ -125,19 +121,18 @@ export default defineNuxtModule({
       write: true,
     });
 
-    const entryPath = pathLib.resolve(buildDir, entry.filename);
-
     nuxt.hook('nitro:init', nitro => {
       nitro.hooks.hook('rollup:before', (_nitro, rollupConfig) => {
         rollupConfig.input =
           typeof rollupConfig.input === 'string'
-            ? [rollupConfig.input, entryPath]
+            ? [rollupConfig.input, entry.dst]
             : Array.isArray(rollupConfig.input)
-              ? [...rollupConfig.input, entryPath]
-              : { ...rollupConfig.input, cli: entryPath };
+              ? [...rollupConfig.input, entry.dst]
+              : { ...rollupConfig.input, cli: entry.dst };
 
         rollupConfig.output.entryFileNames = chunkInfo => {
-          if (chunkInfo.name === 'custom-cli-entry') return 'cli.mjs';
+          console.log(chunkInfo);
+          if (chunkInfo.facadeModuleId === entry.dst) return 'cli.mjs';
           if (chunkInfo.name === 'node-server') return 'index.mjs';
           return '[name].mjs';
         };
