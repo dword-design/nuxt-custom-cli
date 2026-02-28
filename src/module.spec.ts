@@ -6,6 +6,7 @@ import { execaCommand } from 'execa';
 import fs from 'fs-extra';
 import outputFiles from 'output-files';
 import stripAnsi from 'strip-ansi';
+import waitOn from 'wait-on';
 
 import { CUSTOM_CLI_ERROR_MESSAGE } from './module';
 
@@ -87,6 +88,30 @@ test.describe('prod', () => {
     });
 
     expect(stdout).toEqual('hi');
+  });
+
+  test.only('runtime', async ({}, testInfo) => {
+    const cwd = testInfo.outputPath();
+
+    await outputFiles(cwd, {
+      'nuxt.config.ts':
+        "export default defineNuxtConfig({ modules: ['../../src'] });",
+      'server/cli.ts': endent`
+        export default defineCustomCli(async () => {
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          useRuntimeConfig();
+        });
+      `,
+    });
+
+    await execaCommand('nuxt build', { cwd });
+
+    const { stdout } = await execaCommand('node .output/server/cli.mjs', {
+      cwd
+    });
+
+    expect(stdout).toEqual('hi');
+    expect(stdout).not.toMatch('Listening on');
   });
 
   test('error', async ({}, testInfo) => {
