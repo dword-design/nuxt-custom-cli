@@ -11,12 +11,12 @@ import endent from 'endent';
 export const CUSTOM_CLI_ERROR_MESSAGE =
   'Default export from server/cli.ts must be wrapped with defineCustomCli(...).';
 const DEFINE_WRAPPER_USED_MARKER = '__defineCustomCliUsed';
-const TEMPLATE_FOLDER = 'nuxt-custom-cli';
+const TEMPLATE_FOLDER = 'custom-cli';
 
 export default defineNuxtModule({
   setup: (_options, nuxt) => {
     const defineCustomCliTemplate = addTemplate({
-      filename: pathLib.join(TEMPLATE_FOLDER, 'custom-cli-define.ts'),
+      filename: pathLib.join(TEMPLATE_FOLDER, 'define-custom-cli.ts'),
       getContents: () => endent`
         export type CustomCliHandler = () => unknown;
 

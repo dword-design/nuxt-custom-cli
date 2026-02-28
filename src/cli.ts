@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { execaCommand } from 'execa';
 
 process.on('SIGINT', () => process.exit(0));
