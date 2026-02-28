@@ -138,6 +138,33 @@ export default defineNuxtModule({
               ? [...rollupConfig.input, entry.dst]
               : { ...rollupConfig.input, cli: entry.dst };
 
+        const noListenPlugin = {
+          name: 'nuxt-custom-cli-no-listen',
+          renderChunk: (code: string, chunk: { fileName: string }) => {
+            if (!chunk.fileName.endsWith('/nitro/nitro.mjs')) {
+              return null;
+            }
+
+            const noListenPatchedCode = code
+              .replace(
+                'const listener = server.listen(path ? { path } : { port, host }, (err) => {',
+                "const isCliEntry = (process.argv[1] || '').replaceAll('\\\\', '/').endsWith('/cli.mjs');\nconst listener = isCliEntry ? null : server.listen(path ? { path } : { port, host }, (err) => {",
+              )
+              .replace(
+                'setupGracefulShutdown(listener, nitroApp);',
+                'if (listener) {\n  setupGracefulShutdown(listener, nitroApp);\n}',
+              );
+
+            return noListenPatchedCode === code ? null : noListenPatchedCode;
+          },
+        };
+
+        rollupConfig.plugins = Array.isArray(rollupConfig.plugins)
+          ? [...rollupConfig.plugins, noListenPlugin]
+          : rollupConfig.plugins
+            ? [rollupConfig.plugins, noListenPlugin]
+            : [noListenPlugin];
+
         rollupConfig.output.entryFileNames = chunkInfo => {
           if (chunkInfo.facadeModuleId === entry.dst) return 'cli.mjs';
           if (chunkInfo.name === 'node-server') return 'index.mjs';

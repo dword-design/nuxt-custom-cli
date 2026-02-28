@@ -4,8 +4,11 @@ import { expect, test } from '@playwright/test';
 import endent from 'endent';
 import { execaCommand } from 'execa';
 import fs from 'fs-extra';
+import getPort from 'get-port';
 import outputFiles from 'output-files';
+import portReady from 'port-ready';
 import stripAnsi from 'strip-ansi';
+import kill from 'tree-kill-promise';
 
 import { CUSTOM_CLI_ERROR_MESSAGE } from './module';
 
@@ -87,6 +90,38 @@ test.describe('prod', () => {
     });
 
     expect(stdout).toEqual('hi');
+  });
+
+  test('runtime', async ({}, testInfo) => {
+    const cwd = testInfo.outputPath();
+
+    await outputFiles(cwd, {
+      'nuxt.config.ts':
+        "export default defineNuxtConfig({ modules: ['../../src'] });",
+      'server/cli.ts': endent`
+        import { loadRuntime } from './utils/runtime';
+
+        export default defineCustomCli(async () => {
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          loadRuntime();
+        });
+      `,
+      'server/utils/runtime.ts': endent`
+        export const loadRuntime = () => {
+          useRuntimeConfig();
+          useAppConfig();
+        };
+      `,
+    });
+
+    await execaCommand('nuxt build', { cwd });
+
+    const { stdout } = await execaCommand('node .output/server/cli.mjs', {
+      cwd,
+    });
+
+    expect(stdout).toEqual('');
+    expect(stdout).not.toMatch('Listening on');
   });
 
   test('error', async ({}, testInfo) => {
@@ -231,4 +266,37 @@ test('helper files are generated as mjs and d.ts from node_modules package', asy
   await fs.symlink('../../..', pathLib.join(cwd, 'node_modules', 'self'));
   await execaCommand('nuxi prepare', { cwd });
   await execaCommand('nuxt build', { cwd });
+});
+
+test.describe('prod server', () => {
+  test('valid', async ({ page }, testInfo) => {
+    const cwd = testInfo.outputPath();
+
+    await outputFiles(cwd, {
+      'app/pages/index.vue': endent`
+        <template>
+          <div class="foo">hi</div>
+        </template>
+      `,
+      'nuxt.config.ts':
+        "export default defineNuxtConfig({ modules: ['../../src'] });",
+      'server/cli.ts': 'export default defineCustomCli(() => {})',
+    });
+
+    await execaCommand('nuxt build', { cwd });
+    const port = await getPort();
+
+    const nuxt = execaCommand('node .output/server/index.mjs', {
+      cwd,
+      env: { PORT: String(port) },
+    });
+
+    try {
+      await portReady(port);
+      await page.goto(`http://localhost:${port}`);
+      await expect(page.locator('.foo')).toHaveText('hi');
+    } finally {
+      await kill(nuxt.pid!);
+    }
+  });
 });
