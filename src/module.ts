@@ -4,7 +4,6 @@ import {
   addServerImports,
   addServerPlugin,
   addTemplate,
-  addTypeTemplate,
   defineNuxtModule,
 } from '@nuxt/kit';
 import endent from 'endent';
@@ -30,13 +29,14 @@ export default defineNuxtModule({
       write: true,
     });
 
-    addTypeTemplate({
-      filename: `${TEMPLATE_FOLDER}/define-custom-cli.d.ts`,
+    addTemplate({
+      filename: pathLib.join(TEMPLATE_FOLDER, 'define-custom-cli.d.mts'),
       getContents: () => endent`
         export type CustomCliHandler = () => unknown;
 
-        export declare const defineCustomCli: (handler: CustomCliHandler) => CustomCliHandler;
+        export const defineCustomCli: (handler: CustomCliHandler) => CustomCliHandler;
       `,
+      write: true,
     });
 
     addServerImports({
