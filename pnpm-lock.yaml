@@ -36,15 +36,24 @@ importers:
       fs-extra:
         specifier: ^11.3.3
         version: 11.3.3
+      get-port:
+        specifier: ^7.1.0
+        version: 7.1.0
       nuxt:
         specifier: ^4.3.1
         version: 4.3.1(@parcel/watcher@2.5.6)(@types/node@25.3.2)(@vue/compiler-sfc@3.5.29)(cac@6.7.14)(db0@0.3.4)(eslint@9.39.3(jiti@2.6.1))(ioredis@5.9.3)(magicast@0.5.2)(meow@13.2.0)(optionator@0.9.4)(rollup@4.59.0)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.2)(jiti@2.6.1)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2))(vue-tsc@3.2.5(typescript@5.9.3))(yaml@2.8.2)
       output-files:
         specifier: ^4.0.0
         version: 4.0.0
+      port-ready:
+        specifier: npm:@dword-design/port-ready-fork@^0.0.3
+        version: '@dword-design/port-ready-fork@0.0.3'
       strip-ansi:
         specifier: ^7.2.0
         version: 7.2.0
+      tree-kill-promise:
+        specifier: ^5.0.0
+        version: 5.0.0
 
 packages:
 
@@ -387,6 +396,10 @@ packages:
 
   '@dword-design/plugin-name-to-package-name@0.1.2':
     resolution: {integrity: sha512-kATg/RzRkq/Yv0qNJziPqwAzKstBTzuXnowH4MvAMyqW6C7o5HlgZtik3GzO0kBKCBZBoRswBSvo9AHclOTxfg==}
+
+  '@dword-design/port-ready-fork@0.0.3':
+    resolution: {integrity: sha512-nhfPIpKKuAmHoiCaezWlijoLee2RPxdzLlgx0zGdEq5LAyPEPcot7qqc0xIkBNIeOmG+1TVJMKvaV9CSFOQOQg==}
+    engines: {node: '>=6'}
 
   '@dxup/nuxt@0.3.2':
     resolution: {integrity: sha512-2f2usP4oLNsIGjPprvABe3f3GWuIhIDp0169pGLFxTDRI5A4d4sBbGpR+tD9bGZCT+1Btb6Q2GKlyv3LkDCW5g==}
@@ -2652,6 +2665,10 @@ packages:
   confusing-browser-globals@1.0.11:
     resolution: {integrity: sha512-JsPKdmh8ZkmnHxDk55FZ1TqVLvEQTvoByJZRN9jzI0UjxK/QgAmsphz7PGtqgPieQZ/CQcHWXCR7ATDNhGe+YA==}
 
+  connect-port@0.0.1:
+    resolution: {integrity: sha512-wWUq+XRW36RJWnbdtpTl+gM9GC7ifZkq2MkpLSrVHvu7ACAie35CntcEsfDmZX7BJfOZG13oDjzhmbGOCf5j1g==}
+    engines: {node: '>=6'}
+
   consola@3.4.2:
     resolution: {integrity: sha512-5IKcdX0nnYavi6G7TtOhwkYzyjfJlatbjMjuLSfE2kYT5pMDOilZ4OvMhi637CcDICTmz3wARPoyhqyX1Y+XvA==}
     engines: {node: ^14.18.0 || >=16.10.0}
@@ -3586,6 +3603,10 @@ packages:
 
   get-port-please@3.2.0:
     resolution: {integrity: sha512-I9QVvBw5U/hw3RmWpYKRumUeaDgxTPd401x364rLmWBJcOQ753eov1eTgzDqRG9bqFIfDc7gfzcQEWrUri3o1A==}
+
+  get-port@7.1.0:
+    resolution: {integrity: sha512-QB9NKEeDg3xxVwCCwJQ9+xycaz6pBB6iQ76wiWMl1927n0Kir6alPiP+yuiICLLU4jpMe08dXfpebuQppFA2zw==}
+    engines: {node: '>=16'}
 
   get-projectz-readme-section-regex@4.0.0:
     resolution: {integrity: sha512-jr6rJSoA40gyc/qT1P1IREo7pzB0QtIJ0X0nAEwGeCts9aLlw5aJOuNpTBB/6/SlHcw5JmOP+OSQ/EWxXow6qg==}
@@ -4830,6 +4851,10 @@ packages:
     resolution: {integrity: sha512-lastgtAdoH9YaLyDa5i5z64q+kzOcQHsQ5SsZJD3q0VEyI8mq872S3geuNbRUQLVAE9siMfgKrpj7MloKFHruw==}
     engines: {node: '>=12'}
 
+  p-event@1.3.0:
+    resolution: {integrity: sha512-hV1zbA7gwqPVFcapfeATaNjQ3J0NuzorHPyG8GPL9g/Y/TplWVBVoCKCXL6Ej2zscrCEv195QNWJXuBH6XZuzA==}
+    engines: {node: '>=4'}
+
   p-event@6.0.1:
     resolution: {integrity: sha512-Q6Bekk5wpzW5qIyUP4gdMEujObYstZl6DMMOSenwBvV0BlE5LkDwkjs5yHbZmdCEq2o4RJx4tE1vwxFVf2FG1w==}
     engines: {node: '>=16.17'}
@@ -4837,6 +4862,10 @@ packages:
   p-filter@4.1.0:
     resolution: {integrity: sha512-37/tPdZ3oJwHaS3gNJdenCDB3Tz26i9sjhnguBtvN0vYlRIiDNnvTWkuh+0hETV9rLPdJ3rlL3yVOYPIAnM8rw==}
     engines: {node: '>=18'}
+
+  p-finally@1.0.0:
+    resolution: {integrity: sha512-LICb2p9CB7FS+0eR1oqWnHhp0FljGLZCWBE9aix0Uye9W8LTQPwMTYVGWQWIw9RdQiDg4+epXQODwIYJtSJaow==}
+    engines: {node: '>=4'}
 
   p-is-promise@3.0.0:
     resolution: {integrity: sha512-Wo8VsW4IRQSKVXsJCn7TomUaVtyfjVDn3nUP7kE967BQk0CwFpdbZs0X0uk5sW9mkBa9eNM7hCMaG93WUAwxYQ==}
@@ -4894,6 +4923,14 @@ packages:
     resolution: {integrity: sha512-xsrIUgI0Kn6iyDYm9StOpOeK29XM1aboGji26+QEortiFST1hGZaUQOLhtEbqHErPpGW/aSz6allwK2qcptp0Q==}
     engines: {node: '>=12'}
 
+  p-timeout@1.2.1:
+    resolution: {integrity: sha512-gb0ryzr+K2qFqFv6qi3khoeqMZF/+ajxQipEF6NteZVnvz9tzdsfAVj3lYtn1gAXvH5lfLwfxEII799gt/mRIA==}
+    engines: {node: '>=4'}
+
+  p-timeout@2.0.1:
+    resolution: {integrity: sha512-88em58dDVB/KzPEx1X0N3LwFfYZPyDc4B6eF38M1rk9VTZMbxXXgjugz8mmwpS9Ox4BDZ+t6t3QP5+/gazweIA==}
+    engines: {node: '>=4'}
+
   p-timeout@6.1.4:
     resolution: {integrity: sha512-MyIV3ZA/PmyBN/ud8vV9XzwTrNtR4jFrObymZYnZqMmW0zA8Z17vnT0rBgFE/TlohB+YCHqXMgZzb3Csp49vqg==}
     engines: {node: '>=14.16'}
@@ -4905,6 +4942,10 @@ packages:
   p-try@2.2.0:
     resolution: {integrity: sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==}
     engines: {node: '>=6'}
+
+  p-wait-for@1.0.0:
+    resolution: {integrity: sha512-raZs7eMN7mRqP2UEaXMSxDAkSqwN41J0yXCV1AVU9PbB4t7aBAj/6nDPgFcUikX+4GeBgXWLxITAn9hr+bdhrg==}
+    engines: {node: '>=4'}
 
   package-json-from-dist@1.0.1:
     resolution: {integrity: sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==}
@@ -5950,6 +5991,14 @@ packages:
   traverse@0.6.8:
     resolution: {integrity: sha512-aXJDbk6SnumuaZSANd21XAo15ucCDE38H4fkqiGsc3MhCK+wOlZvLP9cB/TvpHT0mOyWgC4Z8EwRlzqYSUzdsA==}
     engines: {node: '>= 0.4'}
+
+  tree-kill-promise@5.0.0:
+    resolution: {integrity: sha512-KHqu1wzZCXYhwE26pj+g49VRnpJ68rtaIr7ycosNpoAw8rwpZSOwek1l9M99wFfFbuEO6WFeXGla0MGlDCTSLQ==}
+    engines: {node: '>=22'}
+
+  tree-kill@1.2.2:
+    resolution: {integrity: sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==}
+    hasBin: true
 
   trim-newlines@3.0.1:
     resolution: {integrity: sha512-c1PTsA3tYrIsLGkJkzHF+w9F2EyxfXGo4UyJc4pFL++FMjnq0HJS69T3M7d//gKrFKwy429bouPescbjecU+Zw==}
@@ -7253,6 +7302,12 @@ snapshots:
   '@dword-design/plugin-name-to-package-name@0.1.2':
     dependencies:
       is-absolute: 1.0.0
+
+  '@dword-design/port-ready-fork@0.0.3':
+    dependencies:
+      connect-port: 0.0.1
+      p-timeout: 2.0.1
+      p-wait-for: 1.0.0
 
   '@dxup/nuxt@0.3.2(magicast@0.5.2)':
     dependencies:
@@ -9481,6 +9536,10 @@ snapshots:
 
   confusing-browser-globals@1.0.11: {}
 
+  connect-port@0.0.1:
+    dependencies:
+      p-event: 1.3.0
+
   consola@3.4.2: {}
 
   conventional-changelog-angular@7.0.0:
@@ -10495,6 +10554,8 @@ snapshots:
   get-package-name@2.2.0: {}
 
   get-port-please@3.2.0: {}
+
+  get-port@7.1.0: {}
 
   get-projectz-readme-section-regex@4.0.0: {}
 
@@ -11912,6 +11973,10 @@ snapshots:
 
   p-each-series@3.0.0: {}
 
+  p-event@1.3.0:
+    dependencies:
+      p-timeout: 1.2.1
+
   p-event@6.0.1:
     dependencies:
       p-timeout: 6.1.4
@@ -11919,6 +11984,8 @@ snapshots:
   p-filter@4.1.0:
     dependencies:
       p-map: 7.0.4
+
+  p-finally@1.0.0: {}
 
   p-is-promise@3.0.0: {}
 
@@ -11966,11 +12033,21 @@ snapshots:
 
   p-reduce@3.0.0: {}
 
+  p-timeout@1.2.1:
+    dependencies:
+      p-finally: 1.0.0
+
+  p-timeout@2.0.1:
+    dependencies:
+      p-finally: 1.0.0
+
   p-timeout@6.1.4: {}
 
   p-try@1.0.0: {}
 
   p-try@2.2.0: {}
+
+  p-wait-for@1.0.0: {}
 
   package-json-from-dist@1.0.1: {}
 
@@ -13021,6 +13098,12 @@ snapshots:
   tr46@0.0.3: {}
 
   traverse@0.6.8: {}
+
+  tree-kill-promise@5.0.0:
+    dependencies:
+      tree-kill: 1.2.2
+
+  tree-kill@1.2.2: {}
 
   trim-newlines@3.0.1: {}
 
