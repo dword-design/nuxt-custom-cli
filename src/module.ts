@@ -4,6 +4,7 @@ import {
   addServerImports,
   addServerPlugin,
   addTemplate,
+  addTypeTemplate,
   defineNuxtModule,
 } from '@nuxt/kit';
 import endent from 'endent';
@@ -16,11 +17,9 @@ const TEMPLATE_FOLDER = 'custom-cli';
 export default defineNuxtModule({
   setup: (options, nuxt) => {
     const defineCustomCliTemplate = addTemplate({
-      filename: pathLib.join(TEMPLATE_FOLDER, 'define-custom-cli.ts'),
+      filename: pathLib.join(TEMPLATE_FOLDER, 'define-custom-cli.mjs'),
       getContents: () => endent`
-        export type CustomCliHandler = () => unknown;
-
-        export const defineCustomCli = (handler: CustomCliHandler) =>
+        export const defineCustomCli = handler =>
           Object.defineProperty(handler, '${DEFINE_WRAPPER_USED_MARKER}', {
             configurable: false,
             enumerable: false,
@@ -29,6 +28,15 @@ export default defineNuxtModule({
           });
       `,
       write: true,
+    });
+
+    addTypeTemplate({
+      filename: `${TEMPLATE_FOLDER}/define-custom-cli.d.ts`,
+      getContents: () => endent`
+        export type CustomCliHandler = () => unknown;
+
+        export declare const defineCustomCli: (handler: CustomCliHandler) => CustomCliHandler;
+      `,
     });
 
     addServerImports({

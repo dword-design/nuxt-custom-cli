@@ -211,3 +211,24 @@ test.describe('defineCustomCli type', () => {
     await expect(execaCommand('nuxt typecheck', { cwd })).rejects.toThrow();
   });
 });
+
+test('helper files are generated as mjs and d.ts from node_modules package', async ({}, testInfo) => {
+  /**
+   * Nuxt moves the buildDir into node_modules/.cache/nuxt if .nuxt already exists and it's not explicitly set in
+   * nuxt.config (see https://github.com/nuxt/nuxt/blob/ada4e8954fa19b917698c3371aefcf7191bdcd02/packages/kit/src/loader/config.ts#L64).
+   * Inside node_modules, TypeScript cannot be transpiled, so we need to make sure that the generated templates still work.
+   */
+  test.setTimeout(60_000);
+  const cwd = testInfo.outputPath();
+
+  await outputFiles(cwd, {
+    'nuxt.config.ts': "export default defineNuxtConfig({ modules: ['self'] });",
+    'server/cli.ts': 'export default defineCustomCli(() => {})',
+  });
+
+  await execaCommand('base prepublishOnly');
+  await fs.ensureDir(pathLib.join(cwd, 'node_modules'));
+  await fs.symlink('../../..', pathLib.join(cwd, 'node_modules', 'self'));
+  await execaCommand('nuxi prepare', { cwd });
+  await execaCommand('nuxt build', { cwd });
+});
