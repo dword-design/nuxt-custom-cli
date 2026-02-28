@@ -1,3 +1,13 @@
+## [2.0.4](https://github.com/dword-design/nuxt-custom-cli/compare/v2.0.3...v2.0.4) (2026-02-28)
+
+
+### Bug Fixes
+
+* do not start server ([c05c687](https://github.com/dword-design/nuxt-custom-cli/commit/c05c687be5c04246a510ac2f0cc9a4f18f149ede))
+* do not start server ([#3](https://github.com/dword-design/nuxt-custom-cli/issues/3)) ([735df44](https://github.com/dword-design/nuxt-custom-cli/commit/735df44f40a7d4dc6d1e2b16adbe98d2e0117ef2))
+* foo ([49ec170](https://github.com/dword-design/nuxt-custom-cli/commit/49ec170d7e9f5bebd9be4f2d7045ee451df381d6))
+* foo ([70c8cd0](https://github.com/dword-design/nuxt-custom-cli/commit/70c8cd00444bbea039b38167b9d704181ec06638))
+
 ## [2.0.3](https://github.com/dword-design/nuxt-custom-cli/compare/v2.0.2...v2.0.3) (2026-02-28)
 
 
