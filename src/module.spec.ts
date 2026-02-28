@@ -6,7 +6,6 @@ import { execaCommand } from 'execa';
 import fs from 'fs-extra';
 import outputFiles from 'output-files';
 import stripAnsi from 'strip-ansi';
-import waitOn from 'wait-on';
 
 import { CUSTOM_CLI_ERROR_MESSAGE } from './module';
 
