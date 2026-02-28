@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/dword-design/nuxt-custom-cli/compare/v2.0.0...v2.0.1) (2026-02-28)
+
+
+### Bug Fixes
+
+* small fixes ([907a7f0](https://github.com/dword-design/nuxt-custom-cli/commit/907a7f02edc9fe788a16afb29337b251e49e414e))
+
 # [2.0.0](https://github.com/dword-design/nuxt-custom-cli/compare/v1.0.0...v2.0.0) (2026-02-27)
 
 
