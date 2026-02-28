@@ -14,7 +14,7 @@ const DEFINE_WRAPPER_USED_MARKER = '__defineCustomCliUsed';
 const TEMPLATE_FOLDER = 'custom-cli';
 
 export default defineNuxtModule({
-  setup: (_options, nuxt) => {
+  setup: (options, nuxt) => {
     const defineCustomCliTemplate = addTemplate({
       filename: pathLib.join(TEMPLATE_FOLDER, 'define-custom-cli.ts'),
       getContents: () => endent`
