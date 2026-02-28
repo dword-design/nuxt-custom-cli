@@ -1,3 +1,11 @@
+## [2.0.3](https://github.com/dword-design/nuxt-custom-cli/compare/v2.0.2...v2.0.3) (2026-02-28)
+
+
+### Bug Fixes
+
+* fix types when build dir is in node_modules ([c082b51](https://github.com/dword-design/nuxt-custom-cli/commit/c082b51fc7be3e778bdf1ac74118de15d7a36285))
+* fixes ([d04ba1e](https://github.com/dword-design/nuxt-custom-cli/commit/d04ba1efbefdfebea9d464d22fab02a529bee732))
+
 ## [2.0.2](https://github.com/dword-design/nuxt-custom-cli/compare/v2.0.1...v2.0.2) (2026-02-28)
 
 
