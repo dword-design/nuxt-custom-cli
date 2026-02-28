@@ -1,3 +1,10 @@
+## [2.0.2](https://github.com/dword-design/nuxt-custom-cli/compare/v2.0.1...v2.0.2) (2026-02-28)
+
+
+### Bug Fixes
+
+* rename options ([042385d](https://github.com/dword-design/nuxt-custom-cli/commit/042385d9c90dee672c77812b3104ded917992741))
+
 ## [2.0.1](https://github.com/dword-design/nuxt-custom-cli/compare/v2.0.0...v2.0.1) (2026-02-28)
 
 
