@@ -1,3 +1,10 @@
+## [2.0.5](https://github.com/dword-design/nuxt-custom-cli/compare/v2.0.4...v2.0.5) (2026-03-27)
+
+
+### Bug Fixes
+
+* throw error if match not found ([be1fc55](https://github.com/dword-design/nuxt-custom-cli/commit/be1fc55e68785f8bba4484466b6af70c03e8a9a0))
+
 ## [2.0.4](https://github.com/dword-design/nuxt-custom-cli/compare/v2.0.3...v2.0.4) (2026-02-28)
 
 
