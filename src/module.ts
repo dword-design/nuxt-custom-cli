@@ -10,6 +10,9 @@ import endent from 'endent';
 
 export const CUSTOM_CLI_ERROR_MESSAGE =
   'Default export from server/cli.ts must be wrapped with defineCustomCli(...).';
+
+export const PROD_NITRO_PATCH_ERROR_MESSAGE =
+  'Failed to patch Nitro server startup code. Nuxt internals may have changed and nuxt-custom-cli needs an update.';
 const DEFINE_WRAPPER_USED_MARKER = '__defineCustomCliUsed';
 const TEMPLATE_FOLDER = 'custom-cli';
 
@@ -145,17 +148,28 @@ export default defineNuxtModule({
               return null;
             }
 
-            const noListenPatchedCode = code
-              .replace(
-                'const listener = server.listen(path ? { path } : { port, host }, (err) => {',
-                "const isCliEntry = (process.argv[1] || '').replaceAll('\\\\', '/').endsWith('/cli.mjs');\nconst listener = isCliEntry ? null : server.listen(path ? { path } : { port, host }, (err) => {",
-              )
-              .replace(
-                'setupGracefulShutdown(listener, nitroApp);',
-                'if (listener) {\n  setupGracefulShutdown(listener, nitroApp);\n}',
-              );
+            const listenSnippet =
+              'const listener = server.listen(path ? { path } : { port, host }, (err) => {';
 
-            return noListenPatchedCode === code ? null : noListenPatchedCode;
+            const shutdownSnippet =
+              'setupGracefulShutdown(listener, nitroApp);';
+
+            const listenReplacement =
+              "const isCliEntry = (process.argv[1] || '').replaceAll('\\\\', '/').endsWith('/cli.mjs');\nconst listener = isCliEntry ? null : server.listen(path ? { path } : { port, host }, (err) => {";
+
+            const shutdownReplacement =
+              'if (listener) {\n  setupGracefulShutdown(listener, nitroApp);\n}';
+
+            if (
+              !code.includes(listenSnippet) ||
+              !code.includes(shutdownSnippet)
+            ) {
+              throw new Error(PROD_NITRO_PATCH_ERROR_MESSAGE);
+            }
+
+            return code
+              .replace(listenSnippet, listenReplacement)
+              .replace(shutdownSnippet, shutdownReplacement);
           },
         };
 

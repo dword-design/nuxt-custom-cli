@@ -10,7 +10,10 @@ import portReady from 'port-ready';
 import stripAnsi from 'strip-ansi';
 import kill from 'tree-kill-promise';
 
-import { CUSTOM_CLI_ERROR_MESSAGE } from './module';
+import {
+  CUSTOM_CLI_ERROR_MESSAGE,
+  PROD_NITRO_PATCH_ERROR_MESSAGE,
+} from './module';
 
 test.describe('dev', () => {
   test('valid', async ({}, testInfo) => {
@@ -73,6 +76,54 @@ test.describe('dev', () => {
 });
 
 test.describe('prod', () => {
+  test('Nitro server code changed', async ({}, testInfo) => {
+    const cwd = testInfo.outputPath();
+
+    await outputFiles(cwd, {
+      'nuxt.config.ts': endent`
+        export default defineNuxtConfig({
+          modules: ['./test-module', '../../src'],
+        });
+      `,
+      'server/cli.ts': 'export default defineCustomCli(() => {})',
+      'test-module.ts': endent`
+        import { defineNuxtModule } from '@nuxt/kit';
+
+        export default defineNuxtModule({
+          setup: (_options, nuxt) => {
+            nuxt.hook('nitro:init', nitro => {
+              nitro.hooks.hook('rollup:before', (_nitro, rollupConfig) => {
+                const mutateNitroPlugin = {
+                  name: 'mutate-nitro-listen-snippet',
+                  renderChunk: (code: string, chunk: { fileName: string }) => {
+                    if (!chunk.fileName.endsWith('/nitro/nitro.mjs')) {
+                      return null;
+                    }
+
+                    return code.replace(
+                      'const listener = server.listen(path ? { path } : { port, host }, (err) => {',
+                      'const listener = server.listen(path ? { path } : { port, host }, () => {',
+                    );
+                  },
+                };
+
+                rollupConfig.plugins = Array.isArray(rollupConfig.plugins)
+                  ? [...rollupConfig.plugins, mutateNitroPlugin]
+                  : rollupConfig.plugins
+                    ? [rollupConfig.plugins, mutateNitroPlugin]
+                    : [mutateNitroPlugin];
+              });
+            });
+          },
+        });
+      `,
+    });
+
+    await expect(execaCommand('nuxt build', { cwd })).rejects.toThrow(
+      PROD_NITRO_PATCH_ERROR_MESSAGE,
+    );
+  });
+
   test('valid', async ({}, testInfo) => {
     const cwd = testInfo.outputPath();
 
