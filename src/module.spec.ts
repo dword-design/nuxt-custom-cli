@@ -2,7 +2,7 @@ import pathLib from 'node:path';
 
 import { expect, test } from '@playwright/test';
 import endent from 'endent';
-import { execaCommand } from 'execa';
+import { execa, execaCommand } from 'execa';
 import fs from 'fs-extra';
 import getPort from 'get-port';
 import outputFiles from 'output-files';
@@ -308,13 +308,31 @@ test('helper files are generated as mjs and d.ts from node_modules package', asy
   const cwd = testInfo.outputPath();
 
   await outputFiles(cwd, {
-    'nuxt.config.ts': "export default defineNuxtConfig({ modules: ['self'] });",
+    '.npmrc': endent`
+      auto-install-peers=false
+      node-linker=hoisted
+    `,
+    'nuxt.config.ts':
+      "export default defineNuxtConfig({ modules: ['@dword-design/nuxt-custom-cli'] });",
+    'package.json': JSON.stringify({
+      name: 'fixture',
+      private: true,
+      type: 'module',
+      version: '1.0.0',
+    }),
     'server/cli.ts': 'export default defineCustomCli(() => {})',
   });
 
-  await execaCommand('base prepublishOnly');
   await fs.ensureDir(pathLib.join(cwd, 'node_modules'));
-  await fs.symlink('../../..', pathLib.join(cwd, 'node_modules', 'self'));
+  await execaCommand('base prepublishOnly');
+  const { stdout } = await execa('pnpm', ['pack', '--pack-destination', cwd]);
+
+  const archiveName = stdout
+    .split('\n')
+    .map(line => line.trim())
+    .findLast(Boolean)!;
+
+  await execa('pnpm', ['add', archiveName], { cwd });
   await execaCommand('nuxi prepare', { cwd });
   await execaCommand('nuxt build', { cwd });
 });
