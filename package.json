@@ -32,7 +32,8 @@
   "dependencies": {
     "@nuxt/kit": "^4.3.1",
     "endent": "npm:@dword-design/endent@^1.4.7",
-    "execa": "^9.6.1"
+    "execa": "^9.6.1",
+    "magic-string": "^0.30.21"
   },
   "devDependencies": {
     "@dword-design/base": "^16.2.3",

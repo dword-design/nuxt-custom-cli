@@ -7,6 +7,7 @@ import {
   defineNuxtModule,
 } from '@nuxt/kit';
 import endent from 'endent';
+import MagicString from 'magic-string';
 
 export const CUSTOM_CLI_ERROR_MESSAGE =
   'Default export from server/cli.ts must be wrapped with defineCustomCli(...).';
@@ -151,25 +152,46 @@ export default defineNuxtModule({
             const listenSnippet =
               'const listener = server.listen(path ? { path } : { port, host }, (err) => {';
 
+            const listenPrefixSnippet = 'const listener = ';
+
             const shutdownSnippet =
               'setupGracefulShutdown(listener, nitroApp);';
 
-            const listenReplacement =
-              "const isCliEntry = (process.argv[1] || '').replaceAll('\\\\', '/').endsWith('/cli.mjs');\nconst listener = isCliEntry ? null : server.listen(path ? { path } : { port, host }, (err) => {";
+            const listenConditionPrefix = 'isCliEntry ? null : ';
 
-            const shutdownReplacement =
-              'if (listener) {\n  setupGracefulShutdown(listener, nitroApp);\n}';
+            const cliEntryDefinition =
+              "const isCliEntry = (process.argv[1] || '').replaceAll('\\', '/').endsWith('/cli.mjs');\n";
 
-            if (
-              !code.includes(listenSnippet) ||
-              !code.includes(shutdownSnippet)
-            ) {
+            const listenStartIndex = code.indexOf(listenSnippet);
+            const shutdownStartIndex = code.indexOf(shutdownSnippet);
+
+            if (listenStartIndex === -1 || shutdownStartIndex === -1) {
               throw new Error(PROD_NITRO_PATCH_ERROR_MESSAGE);
             }
 
-            return code
-              .replace(listenSnippet, listenReplacement)
-              .replace(shutdownSnippet, shutdownReplacement);
+            const magicString = new MagicString(code);
+            magicString.prependLeft(listenStartIndex, cliEntryDefinition);
+
+            magicString.appendLeft(
+              listenStartIndex + listenPrefixSnippet.length,
+              listenConditionPrefix,
+            );
+
+            magicString.prependLeft(shutdownStartIndex, 'if (listener) {\n  ');
+
+            magicString.appendRight(
+              shutdownStartIndex + shutdownSnippet.length,
+              '\n}',
+            );
+
+            return {
+              code: magicString.toString(),
+              map: magicString.generateMap({
+                hires: true,
+                includeContent: true,
+                source: chunk.fileName,
+              }),
+            };
           },
         };
 

@@ -17,6 +17,9 @@ importers:
       execa:
         specifier: ^9.6.1
         version: 9.6.1
+      magic-string:
+        specifier: ^0.30.21
+        version: 0.30.21
     devDependencies:
       '@dword-design/base':
         specifier: ^16.2.3
@@ -51,6 +54,9 @@ importers:
       port-ready:
         specifier: npm:@dword-design/port-ready-fork@^0.0.3
         version: '@dword-design/port-ready-fork@0.0.3'
+      source-map-js:
+        specifier: ^1.2.1
+        version: 1.2.1
       strip-ansi:
         specifier: ^7.2.0
         version: 7.2.0
