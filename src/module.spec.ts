@@ -134,7 +134,11 @@ test.describe('prod', () => {
         "export default defineCustomCli(() => console.log('hi'))",
     });
 
-    await execaCommand('nuxt build', { cwd });
+    const { all } = await execaCommand('nuxt build', { all: true, cwd });
+
+    expect(all).not.toContain(
+      '[plugin nuxt-custom-cli-no-listen] Sourcemap is likely to be incorrect',
+    );
 
     const { stdout } = await execaCommand('node .output/server/cli.mjs', {
       cwd,
@@ -175,28 +179,63 @@ test.describe('prod', () => {
     expect(stdout).not.toMatch('Listening on');
   });
 
-  test('error', async ({}, testInfo) => {
+  test('error uses source map', async ({}, testInfo) => {
     const cwd = testInfo.outputPath();
 
     await outputFiles(cwd, {
       'nuxt.config.ts':
         "export default defineNuxtConfig({ modules: ['../../src'] });",
-      server: {
-        // Auto-import so that server is started
-        'cli.ts': 'export default defineCustomCli(() => foo())',
-        'utils/foo.ts': "export default () => { throw new Error('foo'); }",
-      },
+      'server/cli.ts': endent`
+        export default defineCustomCli(() => {
+          throw new Error('foo');
+        });
+      `,
     });
 
     await execaCommand('nuxt build', { cwd });
 
-    const result = await execaCommand('node .output/server/cli.mjs', {
-      cwd,
-      reject: false,
+    const result = await execaCommand(
+      'node --enable-source-maps .output/server/cli.mjs',
+      { cwd, reject: false },
+    );
+
+    const stderr = stripAnsi(result.stderr);
+    expect(result.exitCode).toBe(1);
+    expect(stderr).toMatch(/^Error: foo$/m);
+    expect(stderr).toMatch(/[\\/]server[\\/]cli\.ts:2:\d+/);
+  });
+
+  test('imported runtime error uses source map', async ({}, testInfo) => {
+    const cwd = testInfo.outputPath();
+
+    await outputFiles(cwd, {
+      'nuxt.config.ts':
+        "export default defineNuxtConfig({ modules: ['../../src'] });",
+      'server/cli.ts': endent`
+        import { loadRuntime } from './utils/runtime';
+
+        export default defineCustomCli(() => {
+          loadRuntime();
+        });
+      `,
+      'server/utils/runtime.ts': endent`
+        export const loadRuntime = () => {
+          throw new Error('runtime foo');
+        };
+      `,
     });
 
+    await execaCommand('nuxt build', { cwd });
+
+    const result = await execaCommand(
+      'node --enable-source-maps .output/server/cli.mjs',
+      { cwd, reject: false },
+    );
+
+    const stderr = stripAnsi(result.stderr);
     expect(result.exitCode).toBe(1);
-    expect(result.stderr).toMatch(/^Error: foo$/m);
+    expect(stderr).toMatch(/^Error: runtime foo$/m);
+    expect(stderr).toMatch(/[\\/]server[\\/]utils[\\/]runtime\.ts:2:\d+/);
   });
 
   test('dependency', async ({}, testInfo) => {
