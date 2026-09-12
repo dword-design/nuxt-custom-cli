@@ -35,7 +35,7 @@
     "execa": "^9.6.1"
   },
   "devDependencies": {
-    "@dword-design/base": "^16.2.3",
+    "@dword-design/base": "^17.0.0",
     "@dword-design/base-config-nuxt-module": "^5.0.1",
     "@playwright/browser-chromium": "^1.58.2",
     "@playwright/test": "^1.58.2",
